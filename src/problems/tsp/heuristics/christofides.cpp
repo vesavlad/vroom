@@ -36,73 +36,87 @@ std::list<index_t> christofides(const matrix<cost_t>& sym_matrix) {
     mst_graph.get_adjacency_list();
 
   // Getting odd degree vertices from the minimum spanning tree.
-  std::vector<index_t> mst_odd_vertices;
+  std::vector<index_t> odd_vertices;
   for (const auto& adjacency : adjacency_list) {
     if (adjacency.second.size() % 2 == 1) {
-      mst_odd_vertices.push_back(adjacency.first);
+      odd_vertices.push_back(adjacency.first);
     }
   }
   BOOST_LOG_TRIVIAL(trace)
-    << "* " << mst_odd_vertices.size()
+    << "* " << odd_vertices.size()
     << " nodes with odd degree in the minimum spanning tree.";
 
-  // Getting corresponding matrix for the generated sub-graph.
-  matrix<cost_t> sub_matrix = sym_matrix.get_sub_matrix(mst_odd_vertices);
-
-  // Computing minimum weight perfect matching.
-  std::unordered_map<index_t, index_t> mwpm =
-    minimum_weight_perfect_matching(sub_matrix);
-
-  // Storing those edges from mwpm that are coherent regarding
-  // symmetry (y -> x whenever x -> y). Remembering the rest of them
-  // for further use. Edges are not doubled in mwpm_final.
   std::unordered_map<index_t, index_t> mwpm_final;
-  std::vector<index_t> wrong_vertices;
+  unsigned previous_odd_vertices_number;
 
-  unsigned total_ok = 0;
-  for (const auto& edge : mwpm) {
-    if (mwpm.at(edge.second) == edge.first) {
-      mwpm_final.emplace(std::min(edge.first, edge.second),
-                         std::max(edge.first, edge.second));
-      ++total_ok;
-    } else {
-      wrong_vertices.push_back(edge.first);
+  // Getting corresponding matrix for the generated sub-graph.
+  matrix<cost_t> sub_matrix;
+  std::vector<index_t> odd_indices;
+
+  do {
+    previous_odd_vertices_number = odd_vertices.size();
+
+    BOOST_LOG_TRIVIAL(trace) << "* Apply Munkres on "
+                             << previous_odd_vertices_number << " nodes.";
+
+    sub_matrix = sym_matrix.get_sub_matrix(odd_vertices);
+
+    // Computing minimum weight perfect matching.
+    std::unordered_map<index_t, index_t> mwpm =
+      minimum_weight_perfect_matching(sub_matrix);
+
+    // Storing those edges from mwpm that are coherent regarding
+    // symmetry (y -> x whenever x -> y). Remembering the rest of them
+    // for further use. Edges are not doubled in mwpm_final.
+    odd_indices.clear();
+    std::vector<index_t> new_odd_vertices;
+    unsigned total_ok = 0;
+    for (const auto& edge : mwpm) {
+      if (mwpm.at(edge.second) == edge.first) {
+        mwpm_final.emplace(std::min(odd_vertices[edge.first],
+                                    odd_vertices[edge.second]),
+                           std::max(odd_vertices[edge.first],
+                                    odd_vertices[edge.second]));
+        ++total_ok;
+      } else {
+        odd_indices.push_back(edge.first);
+        new_odd_vertices.push_back(odd_vertices[edge.first]);
+      }
     }
-  }
 
-  if (!wrong_vertices.empty()) {
-    BOOST_LOG_TRIVIAL(trace) << "* Munkres: " << wrong_vertices.size()
-                             << " useless nodes for symmetry.";
+    odd_vertices = std::move(new_odd_vertices);
+
+    if (!odd_vertices.empty()) {
+      BOOST_LOG_TRIVIAL(trace) << "* Munkres: " << odd_vertices.size()
+                               << " useless nodes for symmetry.";
+    }
+  } while (odd_vertices.size() < previous_odd_vertices_number);
+
+  if (!odd_vertices.empty()) {
+    BOOST_LOG_TRIVIAL(trace) << "* Fall back to greedy matching for "
+                             << odd_vertices.size() << " nodes.";
 
     std::unordered_map<index_t, index_t> remaining_greedy_mwpm =
-      greedy_symmetric_approx_mwpm(sub_matrix.get_sub_matrix(wrong_vertices));
+      greedy_symmetric_approx_mwpm(sub_matrix.get_sub_matrix(odd_indices));
 
     // Adding edges obtained with greedy algo for the missing vertices
     // in mwpm_final.
     for (const auto& edge : remaining_greedy_mwpm) {
-      mwpm_final.emplace(std::min(wrong_vertices[edge.first],
-                                  wrong_vertices[edge.second]),
-                         std::max(wrong_vertices[edge.first],
-                                  wrong_vertices[edge.second]));
+      mwpm_final.emplace(std::min(odd_vertices[edge.first],
+                                  odd_vertices[edge.second]),
+                         std::max(odd_vertices[edge.first],
+                                  odd_vertices[edge.second]));
     }
   }
 
   // Building eulerian graph.
   std::vector<edge<cost_t>> eulerian_graph_edges = mst_graph.get_edges();
 
-  // Adding edges from minimum weight perfect matching (with the
-  // original vertices index). Edges appear twice in matching so we
-  // need to remember the one already added.
-  std::set<index_t> already_added;
+  // Adding edges from minimum weight perfect matching.
   for (const auto& edge : mwpm_final) {
-    index_t first_index = mst_odd_vertices[edge.first];
-    index_t second_index = mst_odd_vertices[edge.second];
-    if (already_added.find(first_index) == already_added.end()) {
-      eulerian_graph_edges.emplace_back(first_index,
-                                        second_index,
-                                        sym_matrix[first_index][second_index]);
-      already_added.insert(second_index);
-    }
+    eulerian_graph_edges.emplace_back(edge.first,
+                                      edge.second,
+                                      sym_matrix[edge.first][edge.second]);
   }
 
   // Building Eulerian graph from the edges.
