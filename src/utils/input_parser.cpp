@@ -10,16 +10,13 @@ All rights reserved (see LICENSE).
 #include <array>
 #include <vector>
 
-#if USE_LIBOSRM
 #include "osrm/exception.hpp"
-#endif
 
-#include "../include/rapidjson/document.h"
-#include "../include/rapidjson/error/en.h"
+#include "rapidjson/document.h"
+#include "rapidjson/error/en.h"
 
-#if USE_LIBOSRM
 #include "routing/libosrm_wrapper.h"
-#endif
+
 #include "routing/orshttp_wrapper.h"
 #include "routing/routed_wrapper.h"
 #include "structures/cl_args.h"
@@ -427,7 +424,6 @@ Input parse(const CLArgs& cl_args) {
       std::make_unique<routing::RoutedWrapper>(common_profile, search->second);
   } break;
   case ROUTER::LIBOSRM:
-#if USE_LIBOSRM
     // Use libosrm.
     try {
       routing_wrapper =
@@ -436,11 +432,6 @@ Input parse(const CLArgs& cl_args) {
       throw Exception(ERROR::ROUTING,
                       "Invalid shared memory region: " + common_profile);
     }
-#else
-    // Attempt to use libosrm while compiling without it.
-    throw Exception(ERROR::ROUTING,
-                    "VROOM compiled without libosrm installed.");
-#endif
     break;
   case ROUTER::ORS:
     // Use ORS http wrapper.

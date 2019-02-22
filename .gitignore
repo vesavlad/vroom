@@ -2,3 +2,6 @@
 *.d
 bin/
 lib/
+.idea/
+cmake-*
+3rdparty/

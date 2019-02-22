@@ -7,8 +7,8 @@ All rights reserved (see LICENSE).
 
 */
 
-#include "../include/rapidjson/document.h"
-#include "../include/rapidjson/error/en.h"
+#include "rapidjson/document.h"
+#include "rapidjson/error/en.h"
 #include <boost/asio.hpp>
 
 #include "routing/orshttp_wrapper.h"
