@@ -16,27 +16,27 @@ All rights reserved (see LICENSE).
 #include "structures/vroom/location.h"
 #include "structures/vroom/solution/route.h"
 
-namespace vroom {
-namespace routing {
+namespace vroom
+{
+    namespace routing
+    {
+        template <class T>
+        class Wrapper
+        {
+         public:
+            std::string _profile;
 
-template <class T> class Wrapper {
+            virtual Matrix<T> get_matrix(const std::vector<Location>& locs) const = 0;
 
-public:
-  std::string _profile;
+            virtual void add_route_info(Route& route) const = 0;
 
-  virtual Matrix<T> get_matrix(const std::vector<Location>& locs) const = 0;
+            virtual ~Wrapper() {}
 
-  virtual void add_route_info(Route& route) const = 0;
+         protected:
+            Wrapper(const std::string& profile) : _profile(profile) {}
+        };
 
-  virtual ~Wrapper() {
-  }
-
-protected:
-  Wrapper(const std::string& profile) : _profile(profile) {
-  }
-};
-
-} // namespace routing
+    } // namespace routing
 } // namespace vroom
 
 #endif

@@ -15,33 +15,34 @@ All rights reserved (see LICENSE).
 
 #include "structures/typedefs.h"
 
-namespace vroom {
-namespace io {
+namespace vroom
+{
+    namespace io
+    {
+        // Profile name used as key.
+        using Servers = std::unordered_map<std::string, Server>;
 
-// Profile name used as key.
-using Servers = std::unordered_map<std::string, Server>;
+        struct CLArgs {
+            // Listing command-line options.
+            Servers     servers;           // -a and -p
+            bool        geometry;          // -g
+            std::string input_file;        // -i
+            std::string output_file;       // -o
+            ROUTER      router;            // -r
+            std::string input;             // cl arg
+            size_t      nb_threads;        // -t
+            size_t      exploration_level; // -x
 
-struct CLArgs {
-  // Listing command-line options.
-  Servers servers;            // -a and -p
-  bool geometry;              // -g
-  std::string input_file;     // -i
-  std::string output_file;    // -o
-  ROUTER router;              // -r
-  std::string input;          // cl arg
-  unsigned nb_threads;        // -t
-  unsigned exploration_level; // -x
+            static const size_t max_exploration_level;
 
-  static const unsigned max_exploration_level;
+            CLArgs();
+        };
 
-  CLArgs();
-};
+        void update_host(Servers& servers, const std::string& value);
 
-void update_host(Servers& servers, const std::string& value);
+        void update_port(Servers& servers, const std::string& value);
 
-void update_port(Servers& servers, const std::string& value);
-
-} // namespace io
+    } // namespace io
 } // namespace vroom
 
 #endif

@@ -12,37 +12,33 @@ All rights reserved (see LICENSE).
 
 #include "structures/typedefs.h"
 
-namespace vroom {
-namespace utils {
+namespace vroom
+{
+    namespace utils
+    {
+        template <class T>
+        class Edge
+        {
+         private:
+            Index _first_vertex;
+            Index _second_vertex;
+            T     _weight;
 
-template <class T> class Edge {
+         public:
+            Edge(Index first_vertex, Index second_vertex, T weight);
 
-private:
-  Index _first_vertex;
-  Index _second_vertex;
-  T _weight;
+            Index get_first_vertex() const { return _first_vertex; }
 
-public:
-  Edge(Index first_vertex, Index second_vertex, T weight);
+            Index get_second_vertex() const { return _second_vertex; }
 
-  Index get_first_vertex() const {
-    return _first_vertex;
-  };
+            bool operator<(const Edge& rhs) const;
 
-  Index get_second_vertex() const {
-    return _second_vertex;
-  };
+            bool operator==(const Edge& rhs) const;
 
-  bool operator<(const Edge& rhs) const;
+            T get_weight() const { return _weight; }
+        };
 
-  bool operator==(const Edge& rhs) const;
-
-  T get_weight() const {
-    return _weight;
-  };
-};
-
-} // namespace utils
+    } // namespace utils
 } // namespace vroom
 
 #endif

@@ -15,37 +15,39 @@ All rights reserved (see LICENSE).
 
 #include "structures/typedefs.h"
 
-namespace vroom {
+namespace vroom
+{
+    template <class T>
+    class Line : private std::vector<T>
+    {
+        using parent = std::vector<T>;
 
-template <class T> class Line : private std::vector<T> {
+     public:
+        using parent::size;
+        using parent::operator[];
 
-  using parent = std::vector<T>;
+        Line(std::size_t n);
 
-public:
-  using parent::size;
-  using parent::operator[];
+        Line(std::initializer_list<T> l);
+    };
 
-  Line(std::size_t n);
+    template <class T>
+    class Matrix : private std::vector<Line<T>>
+    {
+        using parent = std::vector<Line<T>>;
 
-  Line(std::initializer_list<T> l);
-};
+     public:
+        using parent::size;
+        using parent::operator[];
 
-template <class T> class Matrix : private std::vector<Line<T>> {
+        Matrix();
 
-  using parent = std::vector<Line<T>>;
+        Matrix(std::size_t n);
 
-public:
-  using parent::size;
-  using parent::operator[];
+        Matrix(std::initializer_list<Line<T>> l);
 
-  Matrix();
-
-  Matrix(std::size_t n);
-
-  Matrix(std::initializer_list<Line<T>> l);
-
-  Matrix<T> get_sub_matrix(const std::vector<Index>& indices) const;
-};
+        Matrix<T> get_sub_matrix(const std::vector<Index>& indices) const;
+    };
 
 } // namespace vroom
 

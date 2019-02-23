@@ -12,13 +12,14 @@ All rights reserved (see LICENSE).
 
 #include "structures/generic/undirected_graph.h"
 
-namespace vroom {
-namespace utils {
+namespace vroom
+{
+    namespace utils
+    {
+        template <class T>
+        UndirectedGraph<T> minimum_spanning_tree(const UndirectedGraph<T>& graph);
 
-template <class T>
-UndirectedGraph<T> minimum_spanning_tree(const UndirectedGraph<T>& graph);
-
-} // namespace utils
+    } // namespace utils
 } // namespace vroom
 
 #endif

@@ -12,14 +12,15 @@ All rights reserved (see LICENSE).
 
 #include "structures/vroom/input/input.h"
 
-namespace vroom {
-namespace io {
+namespace vroom
+{
+    namespace io
+    {
+        struct CLArgs;
 
-struct CLArgs;
+        Input parse(const CLArgs& cl_args);
 
-Input parse(const CLArgs& cl_args);
-
-} // namespace io
+    } // namespace io
 } // namespace vroom
 
 #endif

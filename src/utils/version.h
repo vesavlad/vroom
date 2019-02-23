@@ -18,9 +18,9 @@ All rights reserved (see LICENSE).
 
 #include <string>
 
-namespace vroom {
-
-std::string get_version();
+namespace vroom
+{
+    std::string get_version();
 
 } // namespace vroom
 

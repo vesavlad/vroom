@@ -11,88 +11,78 @@ All rights reserved (see LICENSE).
 */
 
 #include <array>
+#include <boost/optional.hpp>
 #include <limits>
 #include <list>
 #include <unordered_set>
 #include <vector>
 
-#include <boost/optional.hpp>
+namespace vroom
+{
+    // To easily differentiate variable types.
+    using Id         = uint64_t;
+    using Index      = uint16_t;
+    using Cost       = uint32_t;
+    using Gain       = int64_t;
+    using Distance   = uint32_t;
+    using Duration   = uint32_t;
+    using Coordinate = double;
+    using Capacity   = int64_t;
+    using Skill      = uint32_t;
 
-namespace vroom {
+    // Type helpers.
+    using Coordinates         = std::array<Coordinate, 2>;
+    using OptionalCoordinates = boost::optional<Coordinates>;
+    using Skills              = std::unordered_set<Skill>;
 
-// To easily differentiate variable types.
-using Id = uint64_t;
-using Index = uint16_t;
-using Cost = uint32_t;
-using Gain = int64_t;
-using Distance = uint32_t;
-using Duration = uint32_t;
-using Coordinate = double;
-using Capacity = int64_t;
-using Skill = uint32_t;
+    // Setting max value would cause trouble with further additions.
+    constexpr Cost INFINITE_COST = 3 * (std::numeric_limits<Cost>::max() / 4);
 
-// Type helpers.
-using Coordinates = std::array<Coordinate, 2>;
-using OptionalCoordinates = boost::optional<Coordinates>;
-using Skills = std::unordered_set<Skill>;
+    const std::string DEFAULT_PROFILE = "car";
 
-// Setting max value would cause trouble with further additions.
-constexpr Cost INFINITE_COST = 3 * (std::numeric_limits<Cost>::max() / 4);
+    // Available routing engines.
+    enum class ROUTER { OSRM, LIBOSRM, ORS };
 
-const std::string DEFAULT_PROFILE = "car";
+    // Used to describe a routing server.
+    struct Server {
+        std::string host;
+        std::string port;
 
-// Available routing engines.
-enum class ROUTER { OSRM, LIBOSRM, ORS };
+        Server() : host("0.0.0.0"), port("5000") {}
 
-// Used to describe a routing server.
-struct Server {
-  std::string host;
-  std::string port;
+        Server(const std::string& host, const std::string& port) : host(host), port(port) {}
+    };
 
-  Server() : host("0.0.0.0"), port("5000") {
-  }
+    // Specific error statuses used when handling exceptions.
+    enum class ERROR { INTERNAL, INPUT, ROUTING };
 
-  Server(const std::string& host, const std::string& port)
-    : host(host), port(port) {
-  }
-};
+    // Available location status.
+    enum class STEP_TYPE { START, JOB, END };
 
-// Specific error statuses used when handling exceptions.
-enum class ERROR { INTERNAL, INPUT, ROUTING };
+    // Heuristic options.
+    enum class HEURISTIC { BASIC, DYNAMIC };
+    enum class CLUSTERING { PARALLEL, SEQUENTIAL };
+    enum class INIT { NONE, HIGHER_AMOUNT, NEAREST, FURTHEST, EARLIEST_DEADLINE };
 
-// Available location status.
-enum class STEP_TYPE { START, JOB, END };
+    struct HeuristicParameters {
+        bool       is_clustering; // Use "heuristic" or "type".
+        HEURISTIC  heuristic;
+        CLUSTERING type;
+        INIT       init;
+        float      regret_coeff;
 
-// Heuristic options.
-enum class HEURISTIC { BASIC, DYNAMIC };
-enum class CLUSTERING { PARALLEL, SEQUENTIAL };
-enum class INIT { NONE, HIGHER_AMOUNT, NEAREST, FURTHEST, EARLIEST_DEADLINE };
+        constexpr HeuristicParameters(HEURISTIC heuristic, INIT init, float regret_coeff)
+            : is_clustering(false), heuristic(heuristic), type(CLUSTERING::SEQUENTIAL), // dummy init
+              init(init), regret_coeff(regret_coeff)
+        {
+        }
 
-struct HeuristicParameters {
-  bool is_clustering; // Use "heuristic" or "type".
-  HEURISTIC heuristic;
-  CLUSTERING type;
-  INIT init;
-  float regret_coeff;
-
-  constexpr HeuristicParameters(HEURISTIC heuristic,
-                                INIT init,
-                                float regret_coeff)
-    : is_clustering(false),
-      heuristic(heuristic),
-      type(CLUSTERING::SEQUENTIAL), // dummy init
-      init(init),
-      regret_coeff(regret_coeff) {
-  }
-
-  constexpr HeuristicParameters(CLUSTERING type, INIT init, float regret_coeff)
-    : is_clustering(true),
-      heuristic(HEURISTIC::BASIC), // dummy init
-      type(type),
-      init(init),
-      regret_coeff(regret_coeff) {
-  }
-};
+        constexpr HeuristicParameters(CLUSTERING type, INIT init, float regret_coeff)
+            : is_clustering(true), heuristic(HEURISTIC::BASIC), // dummy init
+              type(type), init(init), regret_coeff(regret_coeff)
+        {
+        }
+    };
 
 } // namespace vroom
 

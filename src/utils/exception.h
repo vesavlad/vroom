@@ -14,15 +14,16 @@ All rights reserved (see LICENSE).
 
 #include "structures/typedefs.h"
 
-namespace vroom {
+namespace vroom
+{
+    class Exception : public std::exception
+    {
+     public:
+        const ERROR       error;
+        const std::string message;
 
-class Exception : public std::exception {
-public:
-  const ERROR error;
-  const std::string message;
-
-  Exception(ERROR error, const std::string& message);
-};
+        Exception(ERROR error, const std::string& message);
+    };
 
 } // namespace vroom
 

@@ -242,12 +242,12 @@ target_link_libraries(vroom ${Boost_LIBRARIES} ${OSRM_LIBRARIES})
 add_dependencies(vroom RapidJSON OSRM)
 
 # 
-# Add the vroom server application
+# Add the vroom application
 #
-add_executable(vroom-server src/main.cpp)
-target_link_libraries(vroom-server vroom ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${TBB_LIBRARIES})
+add_executable(vroom-app src/main.cpp)
+target_link_libraries(vroom-app vroom ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${TBB_LIBRARIES})
 if(UNIX AND NOT APPLE)
-    target_link_libraries(vroom-server rt)
+    target_link_libraries(vroom-app rt)
 endif()
 
 option(VROOM_BUILD_EXAMPLES "Build examples." OFF)

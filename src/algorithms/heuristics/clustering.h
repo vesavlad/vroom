@@ -15,32 +15,34 @@ All rights reserved (see LICENSE).
 #include "structures/vroom/input/input.h"
 #include "structures/vroom/job.h"
 
-namespace vroom {
-namespace heuristics {
+namespace vroom
+{
+    namespace heuristics
+    {
+        class Clustering
+        {
+         private:
+            const Input&     _input;
+            const CLUSTERING _type;
+            const INIT       _init;
+            const float      _regret_coeff;
 
-class Clustering {
-private:
-  const Input& _input;
-  const CLUSTERING _type;
-  const INIT _init;
-  const float _regret_coeff;
+            void parallel_clustering();
+            void sequential_clustering();
 
-  void parallel_clustering();
-  void sequential_clustering();
+         public:
+            // Clusters are relative to the vehicle with same rank in
+            // _input.vehicles.
+            std::vector<std::vector<Index>> clusters;
+            // Cost of all edges added during the clustering process
+            Cost     edges_cost;
+            unsigned assigned_jobs;
+            unsigned non_empty_clusters;
 
-public:
-  // Clusters are relative to the vehicle with same rank in
-  // _input.vehicles.
-  std::vector<std::vector<Index>> clusters;
-  // Cost of all edges added during the clustering process
-  Cost edges_cost;
-  unsigned assigned_jobs;
-  unsigned non_empty_clusters;
+            Clustering(const Input& input, CLUSTERING t, INIT i, float c);
+        };
 
-  Clustering(const Input& input, CLUSTERING t, INIT i, float c);
-};
-
-} // namespace heuristics
+    } // namespace heuristics
 } // namespace vroom
 
 #endif

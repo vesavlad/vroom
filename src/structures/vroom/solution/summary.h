@@ -13,23 +13,23 @@ All rights reserved (see LICENSE).
 #include "structures/vroom/amount.h"
 #include "structures/vroom/solution/computing_times.h"
 
-namespace vroom {
+namespace vroom
+{
+    struct Summary {
+        Cost           cost;
+        const unsigned unassigned;
+        Amount         amount;
+        Duration       service;
 
-struct Summary {
-  Cost cost;
-  const unsigned unassigned;
-  Amount amount;
-  Duration service;
+        Duration       duration;
+        Duration       waiting_time;
+        Distance       distance;
+        ComputingTimes computing_times;
 
-  Duration duration;
-  Duration waiting_time;
-  Distance distance;
-  ComputingTimes computing_times;
+        Summary();
 
-  Summary();
-
-  Summary(unsigned unassigned, unsigned amount_size);
-};
+        Summary(unsigned unassigned, unsigned amount_size);
+    };
 
 } // namespace vroom
 

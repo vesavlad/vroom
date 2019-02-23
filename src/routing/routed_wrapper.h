@@ -12,32 +12,32 @@ All rights reserved (see LICENSE).
 
 #include "routing/osrm_wrapper.h"
 
-namespace vroom {
-namespace routing {
+namespace vroom
+{
+    namespace routing
+    {
+        class RoutedWrapper : public OSRMWrapper
+        {
+         private:
+            Server _server;
 
-class RoutedWrapper : public OSRMWrapper {
+            void update_server();
 
-private:
-  Server _server;
+            std::string build_query(const std::vector<Location>& locations,
+                                    std::string                  service,
+                                    std::string                  extra_args) const;
 
-  void update_server();
+            std::string send_then_receive(std::string query) const;
 
-  std::string build_query(const std::vector<Location>& locations,
-                          std::string service,
-                          std::string extra_args) const;
+         public:
+            RoutedWrapper(const std::string& profile, const Server& server);
 
-  std::string send_then_receive(std::string query) const;
+            virtual Matrix<Cost> get_matrix(const std::vector<Location>& locs) const override;
 
-public:
-  RoutedWrapper(const std::string& profile, const Server& server);
+            virtual void add_route_info(Route& route) const override;
+        };
 
-  virtual Matrix<Cost>
-  get_matrix(const std::vector<Location>& locs) const override;
-
-  virtual void add_route_info(Route& route) const override;
-};
-
-} // namespace routing
+    } // namespace routing
 } // namespace vroom
 
 #endif

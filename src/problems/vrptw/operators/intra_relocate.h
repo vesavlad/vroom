@@ -13,33 +13,35 @@ All rights reserved (see LICENSE).
 #include "problems/cvrp/operators/intra_relocate.h"
 #include "structures/vroom/tw_route.h"
 
-namespace vroom {
-namespace vrptw {
+namespace vroom
+{
+    namespace vrptw
+    {
+        class IntraRelocate : public cvrp::IntraRelocate
+        {
+         private:
+            TWRoute& _tw_s_route;
 
-class IntraRelocate : public cvrp::IntraRelocate {
-private:
-  TWRoute& _tw_s_route;
+            std::vector<Index> _moved_jobs;
+            const Index        _first_rank;
+            const Index        _last_rank;
 
-  std::vector<Index> _moved_jobs;
-  const Index _first_rank;
-  const Index _last_rank;
+         public:
+            IntraRelocate(const Input&                input,
+                          const utils::SolutionState& sol_state,
+                          TWRoute&                    tw_s_route,
+                          Index                       s_vehicle,
+                          Index                       s_rank,
+                          Index                       t_rank); // relocate rank *after* removal.
 
-public:
-  IntraRelocate(const Input& input,
-                const utils::SolutionState& sol_state,
-                TWRoute& tw_s_route,
-                Index s_vehicle,
-                Index s_rank,
-                Index t_rank); // relocate rank *after* removal.
+            virtual bool is_valid() override;
 
-  virtual bool is_valid() override;
+            virtual void apply() override;
 
-  virtual void apply() override;
+            virtual std::vector<Index> addition_candidates() const override;
+        };
 
-  virtual std::vector<Index> addition_candidates() const override;
-};
-
-} // namespace vrptw
+    } // namespace vrptw
 } // namespace vroom
 
 #endif

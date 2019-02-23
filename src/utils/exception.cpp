@@ -9,10 +9,8 @@ All rights reserved (see LICENSE).
 
 #include "utils/exception.h"
 
-namespace vroom {
-
-Exception::Exception(ERROR error, const std::string& message)
-  : error(error), message(message) {
-}
+namespace vroom
+{
+    Exception::Exception(ERROR error, const std::string& message) : error(error), message(message) {}
 
 } // namespace vroom
